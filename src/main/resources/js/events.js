@@ -6,32 +6,65 @@ function rotate(event) {
 
 function rotateObj(obj) {
     if (obj.className.length > 15) {
-        obj.className = obj.className.substring(0, obj.className.length -  " rotate".length);
         if (cardsdisplayed[0].id == obj.id) {
-            cardsdisplayed[0] = cardsdisplayed[1];
-            cardsdisplayed[1] = null;
+            hideCard(0);
         } else if (cardsdisplayed[1].id == obj.id) {
-            cardsdisplayed[1] = cardsdisplayed[0];
-            cardsdisplayed[0] = null;
-        } else {
-            alert('wut ?');
+            hideCard(1);
         }
     } else {
-        obj.className += " rotate";
-        if (cardsdisplayed[0] && cardsdisplayed[1]) {
-            rotateObj(cardsdisplayed[0]);
-            rotateObj(cardsdisplayed[0]);
-            cardsdisplayed[0] = obj;
-        } else if (cardsdisplayed[0]) {
+        if (cardsdisplayed[0]) {
             cardsdisplayed[1] = obj;
-            // TODO win ?
+            rotateAndValidateWith(cardsdisplayed[1], cardsdisplayed[0]);
         } else if (cardsdisplayed[1]) {
             cardsdisplayed[0] = obj;
-            // TODO win ?
+            rotateAndValidateWith(cardsdisplayed[0], cardsdisplayed[1]);
         } else {
             cardsdisplayed[0] = obj;
+            showCard(obj);
         }
     }
+}
+
+function hideCard(idx) {
+    cardsdisplayed[idx].className = cardsdisplayed[idx].className.substring(0, cardsdisplayed[idx].className.length -  " rotate".length);
+    if (idx === 0) {
+        cardsdisplayed[0] = null;
+    } else if (idx === 1) {
+        cardsdisplayed[1] = null;
+    }
+}
+
+function showCard(card) {
+    card.className += " rotate";
+}
+
+var reactionLose = function(event) {
+        event.currentTarget.removeEventListener("transitionend", reactionLose);
+        var myTimer = setTimeout(function() {
+            hideCard(0);
+            hideCard(1);
+            window.clearTimeout(myTimer);
+        },700);
+    };
+var reactionWin = function(event) {
+        event.currentTarget.removeEventListener("transitionend", reactionWin);
+        cardsdisplayed[0].removeEventListener("click", rotate);
+        cardsdisplayed[1].removeEventListener("click", rotate);
+        cardsdisplayed[0] = null;
+        cardsdisplayed[1] = null;
+    };
+
+function rotateAndValidateWith(card1, card2) {
+    if (cardEqual(card1, card2)) {
+        card1.addEventListener("transitionend", reactionWin, false);
+    } else {
+        card1.addEventListener("transitionend", reactionLose, false);
+    }
+    showCard(card1);
+}
+
+function cardEqual(card1, card2) {
+    return card1.attributes.cid.value == card2.attributes.cid.value;
 }
 
 var array = document.getElementsByName("card");

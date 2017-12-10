@@ -7,7 +7,7 @@
 
 <div id="app">
     <div class="f1_container">
-        <div v-for="(todo, idx) in todos" name="card" class="f1_card shadow" v-bind:id="'card'+idx">
+        <div v-for="(todo, idx) in todos" name="card" class="f1_card shadow" v-bind:id="'card'+idx" v-bind:cid="todo.idImg">
             <img class="front face" src="../image/back.png"/>
             <img class="back face v-bind:center" v-bind:src="todo.pathImg"/>
         </div>

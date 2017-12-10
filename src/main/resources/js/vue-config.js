@@ -2,10 +2,10 @@ var app = new Vue({
   el: '#app',
   data: {
     todos: [
-      { pathImg: '../image/a.png' },
-      { pathImg: '../image/a.png' },
-      { pathImg: '../image/a.png' },
-      { pathImg: '../image/b.png' }
+      { idImg:1, pathImg: '../image/a.png' },
+      { idImg:1, pathImg: '../image/a.png' },
+      { idImg:1, pathImg: '../image/a.png' },
+      { idImg:4, pathImg: '../image/b.png' }
     ]
   }
 })
