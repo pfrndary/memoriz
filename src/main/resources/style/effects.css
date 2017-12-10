@@ -12,6 +12,7 @@
 .f1_container {*/
   perspective: 1000;
 }
+
 .f1_card {
   border-style: dotted;
   width: 150px;
