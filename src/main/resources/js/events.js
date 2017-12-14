@@ -1,26 +1,29 @@
 var cardsdisplayed = [];
-var locks = [];
 var msgQueue = [];
 
 function rotate(event) {
-    var id = event.currentTarget.id;
-    if (!locks[id]) {
-        locks[id] = true;
+    if (msgQueue.length == 0) {
+        var id = event.currentTarget.id;
         msgQueue.push(function() {
             rotateObj(id);
-            locks[id] = false;
         });
+        waitAtLeastOneEvent();
     }
-    waitAtLeastOneEvent();
 }
 
 function rotateObj(id) {
     var obj = document.getElementById(id);
     if (obj.className.length > 15) {
-        if (cardsdisplayed[0].id == obj.id) {
-            hideCardById(obj.id);
-        } else if (cardsdisplayed[1].id == obj.id) {
-            hideCardById(obj.id);
+        if (cardsdisplayed[0] && cardsdisplayed[0].id == obj.id) {
+            msgQueue.push(function() {
+                hideCardById(obj.id);
+                cardsdisplayed[0] = null;
+            });
+        } else if (cardsdisplayed[1] && cardsdisplayed[1].id == obj.id) {
+            msgQueue.push(function() {
+                hideCardById(obj.id);
+                cardsdisplayed[1] = null;
+            });
         }
     } else {
         if (cardsdisplayed[0]) {
@@ -103,7 +106,7 @@ function cardEqual(card1, card2) {
 
 var array = document.getElementsByName("card");
 for (var i = 0 ; i < array.length ; i++) {
-    var object = array[i];
+    var object = array[i];°
     object.addEventListener("click", rotate);
 }
 
