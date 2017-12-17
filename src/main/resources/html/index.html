@@ -2,6 +2,7 @@
 <head>
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
     <link rel="stylesheet" type="text/css" href="../style/effects.css">
+    <link rel="stylesheet" type="text/css" href="../style/modal.css">
 </head>
 <body>
 
@@ -14,9 +15,25 @@
     </div>
 </div>
 
+<button id="openModalBtnId">Open Modal</button>
+<div id="modalWindow" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <p>Some text in the Modal..</p>
+        <div class="f1_container">
+            <div name="card" class="f1_card shadow" id="cardModal" cid="idImgModal">
+                <img class="front face" src="../image/back.png"/>
+                <img class="back face v-bind:center" src="../image/a.png"/>
+            </div>
+    </div>
+</div>
+
+    <div id="testd"></div>
+
 <script src="../js/vue-config.js"></script>
 <script src="../js/master.js"></script>
 <script src="../js/card.js"></script>
+<script src="../js/modal.js"></script>
 <!--<script src="../js/events.js"></script>-->
 
 </body>

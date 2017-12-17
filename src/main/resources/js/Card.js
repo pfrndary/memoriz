@@ -13,9 +13,9 @@ class Card {
         //master.notify(this, e.currentTarget);
     }
 
-    showHtmlCard(htmlCard) {
-        e.currentTarget.className += " rotate";
-        e.currentTarget.visible = true;
+    static showHtmlCard(htmlCard) {
+        htmlCard.className += " rotate";
+        htmlCard.visible = true;
     }
 
     hide(e) {
