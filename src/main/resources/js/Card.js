@@ -3,14 +3,20 @@ class Card {
         htmlElement.addEventListener("transitionend", this.callBack, false);
         htmlElement.addEventListener("click", this.turn, false);
         this.callBackActions = [];
+        this.cardMode = htmlElement.attributes.mode || 1;
     }
 
     show(e) {
-        // e.currentTarget.addEventListener("transitionend", this.callBack, false);
         e.currentTarget.className += " rotate";
         e.currentTarget.visible = true;
-        cards[e.currentTarget.id].callBackActions.push( function(evt) { master.notify(cards[evt.currentTarget.id], evt.currentTarget); } );
-        //master.notify(this, e.currentTarget);
+        let card = cards[e.currentTarget.id];
+        if (card.cardMode == 1) {
+            cards[e.currentTarget.id].callBackActions.push( function(evt) {
+                master.notify(cards[evt.currentTarget.id], evt.currentTarget);
+            } );
+        } else {
+            console.log(card.cardMode);
+        }
     }
 
     static showHtmlCard(htmlCard) {
@@ -21,7 +27,9 @@ class Card {
     hide(e) {
         e.currentTarget.className = e.currentTarget.className.substring(0, e.currentTarget.className.length -  " rotate".length);
         e.currentTarget.visible = false;
-        master.notify(this, e.currentTarget);
+        if (this.cardMode == 1) {
+            master.notify(this, e.currentTarget);
+        }
     }
     static hideHtmlCard(htmlCard) {
         htmlCard.className = htmlCard.className.substring(0, htmlCard.className.length -  " rotate".length);

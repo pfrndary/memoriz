@@ -1,3 +1,6 @@
+
+
+
 .f1_container {
   /*position: relative;
   margin: 10px auto;
@@ -21,8 +24,7 @@
   transition: all 0.7s linear;
 }
 .f1_container:hover .f1_card {
-  /*transform: rotateY(180deg);*/
-  /*box-shadow: -5px 5px 5px #aaa;*/
+
 }
 
 .rotate {
@@ -39,8 +41,5 @@
   display: block;
   transform: rotateY(180deg);
   box-sizing: border-box;
-  padding: 10px;
-  /*color: white;
-  text-align: center;
-  background-color: #aaa;*/
+  /*padding: 10px; pk avoir mis ca je retire */
 }

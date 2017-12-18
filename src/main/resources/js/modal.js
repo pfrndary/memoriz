@@ -12,23 +12,22 @@ btn.onclick = function(e) {
     modal.style.display = "block";
     setTimeout(function() {
                let obj = document.getElementById("cardModal");
-               obj.click();
+               Card.showHtmlCard(obj);
             },100);
-
-      /*var cb = document.getElementById('cardModal');
-      var canceled = !cb.dispatchEvent(event);*/
-    // let card = new Card(obj);
-    // Card.showHtmlCard(obj);
 }
 
 // When the user clicks on <span> (x), close the modal
 span.onclick = function() {
+    let obj = document.getElementById("cardModal");
+    Card.hideHtmlCard(obj);
     modal.style.display = "none";
 }
 
 // When the user clicks anywhere outside of the modal, close it
 window.onclick = function(event) {
     if (event.target == modal) {
+        let obj = document.getElementById("cardModal");
+        Card.hideHtmlCard(obj);
         modal.style.display = "none";
     }
 }
