@@ -11,9 +11,9 @@ var span = document.getElementsByClassName("close")[0];
 btn.onclick = function(e) {
     modal.style.display = "block";
     setTimeout(function() {
-               let obj = document.getElementById("cardModal");
-               Card.showHtmlCard(obj);
-            },100);
+       let obj = document.getElementById("cardModal");
+       Card.showHtmlCard(obj);
+    },100);
 }
 
 // When the user clicks on <span> (x), close the modal
