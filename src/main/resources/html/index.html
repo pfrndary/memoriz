@@ -1,15 +1,15 @@
 <html xmlns:v-bind="http://www.w3.org/1999/xhtml">
 <head>
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
-    <link rel="stylesheet" type="text/css" href="../style/effects.css">
-    <link rel="stylesheet" type="text/css" href="../style/modal.css">
+    <link rel="stylesheet" type="text/css" href="./style/effects.css">
+    <link rel="stylesheet" type="text/css" href="./style/modal.css">
 </head>
 <body>
 
 <div id="app">
     <div class="f1_container">
         <div v-for="(todo, idx) in todos" name="card" class="f1_card shadow" v-bind:id="'card'+idx" v-bind:cid="todo.idImg">
-            <img class="front face" src="../image/back.png"/>
+            <img class="front face" src="./image/back.png"/>
             <img class="back face v-bind:center" v-bind:src="todo.pathImg"/>
         </div>
     </div>
@@ -24,7 +24,7 @@
             <div class="f1_container">
                 <div name="card" class="f1_big-card shadow" id="cardModal" cid="idImgModal" mode="2">
                     <img class="front face" src="../image/back.png"/>
-                    <img class="back face v-bind:center" src="../image/a.png"/>
+                    <img class="back face v-bind:center" src="./image/a.png"/>
                 </div>
             </div>
             <div class="card-description">
@@ -36,10 +36,10 @@
 
     <div id="testd"></div>
 
-<script src="../js/vue-config.js"></script>
-<script src="../js/master.js"></script>
-<script src="../js/card.js"></script>
-<script src="../js/modal.js"></script>
+<script src="./js/vue-config.js"></script>
+<script src="./js/master.js"></script>
+<script src="./js/card.js"></script>
+<script src="./js/modal.js"></script>
 <!--<script src="../js/events.js"></script>-->
 
 </body>

@@ -1,7 +1,7 @@
 
 var imgs = [
-    '../image/a.png',
-    '../image/b.png'
+    './image/a.png',
+    './image/b.png'
 ];
 
 /*
