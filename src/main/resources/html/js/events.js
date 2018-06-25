@@ -13,7 +13,7 @@ function rotate(event) {
 
 function rotateObj(id) {
     var obj = document.getElementById(id);
-    if (obj.className.length > 15) {
+    if (obj.className.length > 15) { // if the card is already displayed
         if (cardsdisplayed[0] && cardsdisplayed[0].id == obj.id) {
             msgQueue.push(function() {
                 hideCardById(obj.id);
@@ -25,7 +25,7 @@ function rotateObj(id) {
                 cardsdisplayed[1] = null;
             });
         }
-    } else {
+    } else { // otherwise it s hidden
         if (cardsdisplayed[0]) {
             msgQueue.push(function() {
                 cardsdisplayed[1] = obj;
@@ -43,7 +43,7 @@ function rotateObj(id) {
             });
         }
         waitAtLeastOneEvent();
-        waitAtLeastOneEvent();
+        waitAtLeastOneEvent(); // twice ???
     }
 }
 
@@ -64,7 +64,7 @@ var reactionLose = function(id1, id2) {
             hideCardById(id2);
             cardsdisplayed[0] = null;
             cardsdisplayed[1] = null;
-        },700);
+        },900);
     };
 
 var reactionWin = function(id1, id2) {

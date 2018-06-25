@@ -1,0 +1,242 @@
+<html>
+    <head>
+        <script>
+            function byId(i) {
+                return document.getElementById(i);
+            }
+        </script>
+        <style>
+.container {
+    width: 700px;
+    height: 300px;
+    /*border: 3px solid black;*/
+    display: flex;
+    flex-direction: column;
+    font-size: 20px;
+}
+
+.boite {
+    /*border: 3px solid red;*/
+    flex: 1;
+     display: flex;
+    justify-content: space-around;
+}
+
+.element {
+    /*border: 3px solid green;*/
+}
+        </style>
+    </head>
+    <body>
+
+    <div id="container" class="container">
+       <!--
+       <div class="boite">
+            <div class="element">Élément 1</div>
+            <div class="element">Élement 4</div>
+        </div>
+        <div class="boite">
+            <div class="element">Élément 3</div>
+            <div class="element">Élément 3</div>
+            <div class="element">Élément 3</div>
+        </div>
+        <div class="boite">
+            <div class="element">Élément 2</div>
+            <div class="element">Élément 5</div>
+        </div>
+        <div class="boite">
+            <div class="element">Élement 6</div>
+        </div>-->
+
+    </div>
+
+        <div id="letterspanel">
+
+        </div>
+
+        <script>
+            const LETTERS_NUMBER_PER_ROW = 5;
+            const FULL_WORD_KEY = "fullWord";
+            const SOLUTION_FOUND = "solutionFound";
+            var allowedChars = "abcdefghijklmnopqrstuvwxyz0123456789%_"; // TODO valider au startup que c'est toujours valid ?
+            var allowedCharsRegex = /^[a-zA-Z_0-9%']+$/;
+            var dico = [
+                "Savons", "Lessive", "Liquide_vaisselle", "papier_toilette",
+                "Papier_sulfurise", "Cotons_tiges", "Lait",  "Yahourt",  "Cafe",  "Salade_lentilles", "Jus_orange", "Kiwi", "Sauce_tomate",
+                "Sardines",  "Madeleines", "Fruits_secs", "Kombucha", "Crackers", "pistache", "jus_d'orange", "lait_bio_1%", "chocolat_au_lait"];
+            var mapping = {};
+            var relativePath = null;
+            var level = 0;
+
+             function addRowOfLetters(container, letters) {
+                var letter = letters.shift();
+                var numRow = 0;
+                var maxElementPerRow = getMaxNumberLetter(numRow);
+                var currentNumberLetter = 0;
+                var currentTagRow = getLetterRowHTML();
+                while (letter) {
+                    var tag = getLetterHtmlElement(letter);
+                    currentTagRow.appendChild(tag);
+                    currentNumberLetter++;
+                    letter = letters.shift();
+                    if (letter && currentNumberLetter == maxElementPerRow) {
+                        container.appendChild(currentTagRow);
+                        currentTagRow = getLetterRowHTML();
+                        numRow++;
+                        currentNumberLetter = 0;
+                        maxElementPerRow = getMaxNumberLetter(numRow);
+                    }
+                }
+                while (currentNumberLetter < maxElementPerRow) {
+                    currentTagRow.appendChild(getFakeLetterHtmlElement());
+                    currentNumberLetter++;
+                }
+                container.appendChild(currentTagRow);
+            }
+
+            for (var i = 0 ; i < dico.length ; i++) {
+                var mot = dico[i].toLowerCase();
+                if (allowedCharsRegex.test(mot)) {
+                    console.log(mot + " est valide");
+                } else {
+                    console.log(mot + " est incorrect");
+                }
+                relativePath = mapping;
+                for (var j = 0 ; j < mot.length ; j++) {
+                    var letter = mot[j];
+                    if (relativePath[letter]) {
+                        relativePath = relativePath[letter];
+                    } else {
+                        relativePath[letter] = {};
+                        relativePath = relativePath[letter];
+                    }
+                    if (j >= mot.length-1) {
+                        relativePath[FULL_WORD_KEY] = mot;
+                    }
+                }
+            }
+            // Réinitialise a la racine
+            relativePath = mapping;
+
+
+
+            /* OLD WAY var panel = byId("letterspanel");
+            for (var i = 0 ; i < allowedChars.length ; i++) {
+                var aTag = getLetterHtmlLink(allowedChars[i]);
+                panel.appendChild(aTag);
+                var br = document.createElement('br');
+                aTag.appendChild(br)
+            }*/
+
+            var panel = byId("container");
+            addRowOfLetters(container, allowedChars.split('')); // TODO cloner le tableau ?
+
+            function getLetterHtmlLink(letter) {
+                var aTag = document.createElement('a');
+                aTag.setAttribute('href',"#");
+                aTag.setAttribute('id',"idChar"+letter);
+                // aTag.setAttribute('style',"display:none");
+                aTag.setAttribute('onclick',"moveTo('"+letter+"')");
+                aTag.innerHTML = letter;
+                return aTag;
+            }
+
+hideAllLetters();
+            refreshAllowedLetters();
+
+            function explore(jsonMap, maxDeep) {
+                if (maxDeep == 0) return undefined;
+                if (jsonMap[FULL_WORD_KEY]) {
+                    return jsonMap[FULL_WORD_KEY];
+                }
+                var nbrBrothers = Object.keys(jsonMap).length;
+
+                for (var letter in jsonMap) {
+                      var word = explore(jsonMap[letter], maxDeep-1);
+                      if (!word) {
+                        continue;
+                      }
+                      if (nbrBrothers == 1) {
+                        return word;
+                      } else {
+                        console.log("nbrBrothers = "+nbrBrothers+"solution trouvee pour "+word + " inscrit la " + letter);
+                        jsonMap[letter][SOLUTION_FOUND] = word;
+                      }
+                }
+                return undefined;
+            }
+
+            explore(mapping, 20);
+            console.log(JSON.stringify(mapping));
+
+            function hideAllLetters() {
+                for (var i = 0 ; i < allowedChars.length ; i++) {
+                    byId("elemChar"+allowedChars[i]).style = "display:none";
+                }
+            }
+            function refreshAllowedLetters() {
+                for (var l in relativePath) {
+                    // console.log(l);
+                    if (!byId("elemChar"+l)) {
+                     console.log("elemChar"+l + " est introuvable ?!");
+                    }
+                    byId("elemChar"+l).style = "";
+                }
+            }
+
+
+            /*var container = byId('container');
+            addRowOfLetters(container, ["a", "b", "c", "d", "e", "z", "g", "y", "w"]);*/
+
+            function getLetterRowHTML() {
+                var div = document.createElement("div");
+                div.setAttribute('class',"boite");
+                return div;
+            }
+
+            function getLetterHtmlElement(letter) {
+                var div = document.createElement("div");
+                div.setAttribute('class',"element");
+                div.setAttribute('id',"elemChar"+letter);
+               // div.innerHTML = letter;
+               var tag = getLetterHtmlLink(letter);
+               //console.log(tag);
+                div.appendChild(tag);
+                return div;
+//                <div class="element">Élément 1</div>
+            }
+
+            function getFakeLetterHtmlElement() {
+                var div = document.createElement("div");
+                div.setAttribute('class',"element");
+                div.innerHTML = "*";
+                return div;
+            }
+
+            function getMaxNumberLetter(numRow) {
+                return LETTERS_NUMBER_PER_ROW + numRow % 2;
+            }
+
+            function moveTo(letter) {
+                if (relativePath[letter]) {
+                    relativePath = relativePath[letter];
+                } else {
+                    console.log("la lettre "+letter + " ne fait pas partie des solutions valide. (solutions possibles : " + JSON.stringify(relativePath)+")");
+                }
+                hideAllLetters();
+                if (relativePath[SOLUTION_FOUND]) {
+                  wordFound(relativePath[SOLUTION_FOUND]);
+                } else {
+                    refreshAllowedLetters();
+                }
+            }
+
+            function wordFound(word) {
+                alert("c'est " + word);
+                relativePath = mapping;
+                refreshAllowedLetters();
+            }
+
+        </script>
+    </body>
+</html>
