@@ -118,16 +118,6 @@
             // Réinitialise a la racine
             relativePath = mapping;
 
-
-
-            /* OLD WAY var panel = byId("letterspanel");
-            for (var i = 0 ; i < allowedChars.length ; i++) {
-                var aTag = getLetterHtmlLink(allowedChars[i]);
-                panel.appendChild(aTag);
-                var br = document.createElement('br');
-                aTag.appendChild(br)
-            }*/
-
             var panel = byId("container");
             addRowOfLetters(container, allowedChars.split('')); // TODO cloner le tableau ?
 
@@ -135,13 +125,12 @@
                 var aTag = document.createElement('a');
                 aTag.setAttribute('href',"#");
                 aTag.setAttribute('id',"idChar"+letter);
-                // aTag.setAttribute('style',"display:none");
                 aTag.setAttribute('onclick',"moveTo('"+letter+"')");
                 aTag.innerHTML = letter;
                 return aTag;
             }
 
-hideAllLetters();
+            hideAllLetters();
             refreshAllowedLetters();
 
             function explore(jsonMap, maxDeep) {
@@ -184,10 +173,6 @@ hideAllLetters();
                 }
             }
 
-
-            /*var container = byId('container');
-            addRowOfLetters(container, ["a", "b", "c", "d", "e", "z", "g", "y", "w"]);*/
-
             function getLetterRowHTML() {
                 var div = document.createElement("div");
                 div.setAttribute('class',"boite");
@@ -198,12 +183,9 @@ hideAllLetters();
                 var div = document.createElement("div");
                 div.setAttribute('class',"element");
                 div.setAttribute('id',"elemChar"+letter);
-               // div.innerHTML = letter;
                var tag = getLetterHtmlLink(letter);
-               //console.log(tag);
                 div.appendChild(tag);
                 return div;
-//                <div class="element">Élément 1</div>
             }
 
             function getFakeLetterHtmlElement() {
