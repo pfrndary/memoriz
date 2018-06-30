@@ -1,5 +1,11 @@
 <html>
     <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="stylesheet" href="style/bootstrap.min.css">
+        <script src="js/shoplist/global.js"></script>
+        <script src="js/shoplist/textassist.js"></script>
+        <script src="js/shoplist/viewfunctions.js"></script>
         <script>
             function byId(i) {
                 return document.getElementById(i);
@@ -30,195 +36,66 @@
     <body>
 
     <div id="container" class="container">
-       <!--
-       <div class="boite">
-            <div class="element">Élément 1</div>
-            <div class="element">Élement 4</div>
-        </div>
-        <div class="boite">
-            <div class="element">Élément 3</div>
-            <div class="element">Élément 3</div>
-            <div class="element">Élément 3</div>
-        </div>
-        <div class="boite">
-            <div class="element">Élément 2</div>
-            <div class="element">Élément 5</div>
-        </div>
-        <div class="boite">
-            <div class="element">Élement 6</div>
-        </div>-->
+       <!-- FILLED with JS -->
 
     </div>
+    <!-- UNUSED ??
+           <div id="letterspanel">
 
-        <div id="letterspanel">
+           </div> -->
 
+
+       <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="articlesListId" class="list-group">
+                        <!--FILLED with JS-->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" disabled>Annuler</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="callAddCart(1)">1</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="callAddCart(2)">2</button>
+                   <!-- <button type="button" class="btn btn-primary">Save changes</button>-->
+                </div>
+            </div>
         </div>
+    </div>
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+        Launch demo modal
+    </button>
 
         <script>
-            const LETTERS_NUMBER_PER_ROW = 5;
-            const FULL_WORD_KEY = "fullWord";
-            const SOLUTION_FOUND = "solutionFound";
-            var allowedChars = "abcdefghijklmnopqrstuvwxyz0123456789%_"; // TODO valider au startup que c'est toujours valid ?
-            var allowedCharsRegex = /^[a-zA-Z_0-9%']+$/;
-            var dico = [
-                "Savons", "Lessive", "Liquide_vaisselle", "papier_toilette",
-                "Papier_sulfurise", "Cotons_tiges", "Lait",  "Yahourt",  "Cafe",  "Salade_lentilles", "Jus_orange", "Kiwi", "Sauce_tomate",
-                "Sardines",  "Madeleines", "Fruits_secs", "Kombucha", "Crackers", "pistache", "jus_d'orange", "lait_bio_1%", "chocolat_au_lait"];
-            var mapping = {};
-            var relativePath = null;
-            var level = 0;
+             var level = 0;
 
-             function addRowOfLetters(container, letters) {
-                var letter = letters.shift();
-                var numRow = 0;
-                var maxElementPerRow = getMaxNumberLetter(numRow);
-                var currentNumberLetter = 0;
-                var currentTagRow = getLetterRowHTML();
-                while (letter) {
-                    var tag = getLetterHtmlElement(letter);
-                    currentTagRow.appendChild(tag);
-                    currentNumberLetter++;
-                    letter = letters.shift();
-                    if (letter && currentNumberLetter == maxElementPerRow) {
-                        container.appendChild(currentTagRow);
-                        currentTagRow = getLetterRowHTML();
-                        numRow++;
-                        currentNumberLetter = 0;
-                        maxElementPerRow = getMaxNumberLetter(numRow);
-                    }
-                }
-                while (currentNumberLetter < maxElementPerRow) {
-                    currentTagRow.appendChild(getFakeLetterHtmlElement());
-                    currentNumberLetter++;
-                }
-                container.appendChild(currentTagRow);
+            // calls
+            function callGetArticles() {
+                return mockDico;
+            }
+            function callAddCart(qty) {
+                let article = selectedItemId;
+                console.log('cmd '+article+' x '+qty);
             }
 
-            for (var i = 0 ; i < dico.length ; i++) {
-                var mot = dico[i].toLowerCase();
-                if (allowedCharsRegex.test(mot)) {
-                    console.log(mot + " est valide");
-                } else {
-                    console.log(mot + " est incorrect");
-                }
-                relativePath = mapping;
-                for (var j = 0 ; j < mot.length ; j++) {
-                    var letter = mot[j];
-                    if (relativePath[letter]) {
-                        relativePath = relativePath[letter];
-                    } else {
-                        relativePath[letter] = {};
-                        relativePath = relativePath[letter];
-                    }
-                    if (j >= mot.length-1) {
-                        relativePath[FULL_WORD_KEY] = mot;
-                    }
-                }
-            }
-            // Réinitialise a la racine
-            relativePath = mapping;
-
+            validateArticlesFormatAndBuildTree(callGetArticles()); // promise ?
+            explore(articlesTree, 20);
+            console.log(JSON.stringify(articlesTree));
             var panel = byId("container");
-            addRowOfLetters(container, allowedChars.split('')); // TODO cloner le tableau ?
-
-            function getLetterHtmlLink(letter) {
-                var aTag = document.createElement('a');
-                aTag.setAttribute('href',"#");
-                aTag.setAttribute('id',"idChar"+letter);
-                aTag.setAttribute('onclick',"moveTo('"+letter+"')");
-                aTag.innerHTML = letter;
-                return aTag;
-            }
-
+            addRowOfLetters(container, allowedChars.split(''));
             hideAllLetters();
             refreshAllowedLetters();
-
-            function explore(jsonMap, maxDeep) {
-                if (maxDeep == 0) return undefined;
-                if (jsonMap[FULL_WORD_KEY]) {
-                    return jsonMap[FULL_WORD_KEY];
-                }
-                var nbrBrothers = Object.keys(jsonMap).length;
-
-                for (var letter in jsonMap) {
-                      var word = explore(jsonMap[letter], maxDeep-1);
-                      if (!word) {
-                        continue;
-                      }
-                      if (nbrBrothers == 1) {
-                        return word;
-                      } else {
-                        console.log("nbrBrothers = "+nbrBrothers+"solution trouvee pour "+word + " inscrit la " + letter);
-                        jsonMap[letter][SOLUTION_FOUND] = word;
-                      }
-                }
-                return undefined;
-            }
-
-            explore(mapping, 20);
-            console.log(JSON.stringify(mapping));
-
-            function hideAllLetters() {
-                for (var i = 0 ; i < allowedChars.length ; i++) {
-                    byId("elemChar"+allowedChars[i]).style = "display:none";
-                }
-            }
-            function refreshAllowedLetters() {
-                for (var l in relativePath) {
-                    // console.log(l);
-                    if (!byId("elemChar"+l)) {
-                     console.log("elemChar"+l + " est introuvable ?!");
-                    }
-                    byId("elemChar"+l).style = "";
-                }
-            }
-
-            function getLetterRowHTML() {
-                var div = document.createElement("div");
-                div.setAttribute('class',"boite");
-                return div;
-            }
-
-            function getLetterHtmlElement(letter) {
-                var div = document.createElement("div");
-                div.setAttribute('class',"element");
-                div.setAttribute('id',"elemChar"+letter);
-               var tag = getLetterHtmlLink(letter);
-                div.appendChild(tag);
-                return div;
-            }
-
-            function getFakeLetterHtmlElement() {
-                var div = document.createElement("div");
-                div.setAttribute('class',"element");
-                div.innerHTML = "*";
-                return div;
-            }
-
-            function getMaxNumberLetter(numRow) {
-                return LETTERS_NUMBER_PER_ROW + numRow % 2;
-            }
-
-            function moveTo(letter) {
-                if (relativePath[letter]) {
-                    relativePath = relativePath[letter];
-                } else {
-                    console.log("la lettre "+letter + " ne fait pas partie des solutions valide. (solutions possibles : " + JSON.stringify(relativePath)+")");
-                }
-                hideAllLetters();
-                if (relativePath[SOLUTION_FOUND]) {
-                  wordFound(relativePath[SOLUTION_FOUND]);
-                } else {
-                    refreshAllowedLetters();
-                }
-            }
-
-            function wordFound(word) {
-                alert("c'est " + word);
-                relativePath = mapping;
-                refreshAllowedLetters();
-            }
-
         </script>
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+
     </body>
 </html>
