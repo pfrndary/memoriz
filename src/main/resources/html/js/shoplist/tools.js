@@ -26,3 +26,24 @@ function waitAtLeastOneEvent() {
         }
     }, 20);
 }
+
+
+/*
+GENERATE HTML TAG
+USAGE :
+let tagInput = htmlTag("input", {id:"myId", type:"text", class:"myInputClass"}); // last parameter optional
+let tagDiv = htmlTag("div", {id:"myId", class:"myDivClass"}); // last parameter optional
+tagDiv.appendChild(tagInput);
+parentTag.appendChild(tagDiv);
+*/
+
+function htmlTag(tag, attr, innerHTML) {
+    let element = document.createElement(tag);
+    for (let k in attr) {
+        element.setAttribute(k, attr[k]);
+    }
+    if (innerHTML) {
+        element.innerHTML = innerHTML;
+    }
+    return element;
+}
