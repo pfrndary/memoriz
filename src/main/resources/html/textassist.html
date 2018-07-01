@@ -3,12 +3,17 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <link rel="stylesheet" href="style/bootstrap.min.css">
-        <script src="js/shoplist/global.js"></script>
         <script src="js/shoplist/textassist.js"></script>
         <script src="js/shoplist/viewfunctions.js"></script>
+        <script src="js/shoplist/callserver.js"></script>
+        <script src="js/shoplist/tools.js"></script>
+        <script src="js/shoplist/jquery-3.3.1.min.js"></script>
         <script>
             function byId(i) {
                 return document.getElementById(i);
+            }
+            function log(t) {
+                console.log(t);
             }
         </script>
         <style>
@@ -35,28 +40,33 @@
     </head>
     <body>
 
-    <div id="container" class="container">
-       <!-- FILLED with JS -->
-
+    <div class="container">
+        <div class="row justify-content-md-center">
+            <div class="col">
+                <div id="letterspanel" class="letterspanel">
+                    <!-- FILLED with JS -->
+                </div>
+            </div>
+            <div class="col col-lg-2">
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#cartModal">
+                    Liste complète
+                </button>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#cartModal">
+                    Recharger les articles possibles
+                </button>
+            </div>
+        </div>
     </div>
-    <!-- UNUSED ??
-           <div id="letterspanel">
 
-           </div> -->
-
-
-       <!-- Modal -->
+    <!-- CHOIX ARTICLE -->
     <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <h5 class="modal-title" id="exampleModalLabel">Quel article ?</h5>
                 </div>
                 <div class="modal-body">
-                    <div id="articlesListId" class="list-group">
+                    <div id="articlesListId" class="form-row">
                         <!--FILLED with JS-->
                     </div>
                 </div>
@@ -69,31 +79,44 @@
             </div>
         </div>
     </div>
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
-        Launch demo modal
-    </button>
+
+    <!-- PANIER -->
+    <div class="modal fade" id="cartModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cartModalLabel">Liste de courses</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="articlesCartId" class="input-group">
+                        <!--FILLED with JS-->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="callAddCart(1)">Envoyer la liste</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="saveCart()">Sauvegarder</button>
+                    <!-- <button type="button" class="btn btn-primary">Save changes</button>-->
+                </div>
+            </div>
+        </div>
+    </div>
 
         <script>
-             var level = 0;
-
-            // calls
-            function callGetArticles() {
-                return mockDico;
-            }
-            function callAddCart(qty) {
-                let article = selectedItemId;
-                console.log('cmd '+article+' x '+qty);
-            }
-
+            let listeCourses = callGetCart();
+            var level = 0;
             validateArticlesFormatAndBuildTree(callGetArticles()); // promise ?
             explore(articlesTree, 20);
             console.log(JSON.stringify(articlesTree));
-            var panel = byId("container");
-            addRowOfLetters(container, allowedChars.split(''));
+            var letterspanel = byId("letterspanel");
+            addRowOfLetters(letterspanel, allowedChars.split(''));
             hideAllLetters();
             refreshAllowedLetters();
+            fillCartArticles(listeCourses);
         </script>
-        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
 
