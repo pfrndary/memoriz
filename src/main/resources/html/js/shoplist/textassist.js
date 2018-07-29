@@ -1,15 +1,16 @@
 const FULL_WORD_KEY = "fullWord";
 const SOLUTION_FOUND = "solutionFound";
+const PROPOSAL_KEY = "proposals";
 var allowedChars = "abcdefghijklmnopqrstuvwxyz0123456789%_";
 var allowedCharsRegex = /^[a-zA-Z_0-9%']+$/;
 var articlesTree = {};
 var relativePath = null;
 
-var mockDico = [
+/*var mockDico = [
     "Savons", "Lessive", "Liquide_vaisselle", "papier_toilette",
     "Papier_sulfurise", "Cotons_tiges", "Lait",  "Yahourt",  "Cafe",  "Salade_lentilles", "Jus_orange", "Kiwi", "Sauce_tomate",
     "Sardines",  "Madeleines", "Fruits_secs", "Kombucha", "Crackers", "pistache", "jus_d'orange", "lait_bio_1%", "chocolat_au_lait"];
-
+*/
 function explore(jsonMap, maxDeep) {
     if (maxDeep == 0) return undefined;
     if (jsonMap[FULL_WORD_KEY]) {
@@ -30,6 +31,27 @@ function explore(jsonMap, maxDeep) {
           }
     }
     return undefined;
+}
+
+function exploreForProposal(jsonMap, maxDeep) {
+    if (maxDeep == 0) return undefined;
+    if (jsonMap[SOLUTION_FOUND]) {
+        return [jsonMap[SOLUTION_FOUND]];
+    }
+    let proposals = [];
+    for (var letter in jsonMap) {
+          var words = exploreForProposal(jsonMap[letter], maxDeep-1);
+          if (!words) {
+            continue;
+          }
+          log("word " + words.length);
+          proposals = proposals.concat(words);
+          log("prop " + proposals.length);
+    }
+    if (proposals.length > 0 && proposals.length < 5) {
+        jsonMap[letter][PROPOSAL_KEY] = proposals;
+    }
+    return proposals;
 }
 
  function validateArticlesFormatAndBuildTree(dico) {

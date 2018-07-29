@@ -43,13 +43,18 @@
     <div class="container">
         <div class="row justify-content-md-center">
             <div class="col">
+                <div id="allArticlesListId" class="form-row">
+
+                </div>
+            </div>
+            <div class="col">
                 <div id="letterspanel" class="letterspanel">
                     <!-- FILLED with JS -->
                 </div>
             </div>
             <div class="col col-lg-2">
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#cartModal">
-                    Liste complète
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#cartModal" onclick="clearArticlesInCartModal();fillCartArticles(cart)">
+                    Liste de course
                 </button>
                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#cartModal">
                     Recharger les articles possibles
@@ -71,7 +76,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal" disabled>Annuler</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="callAddCart(1)">1</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="callAddCart(2)">2</button>
                    <!-- <button type="button" class="btn btn-primary">Save changes</button>-->
@@ -106,16 +111,30 @@
     </div>
 
         <script>
-            let listeCourses = callGetCart();
             var level = 0;
-            validateArticlesFormatAndBuildTree(callGetArticles()); // promise ?
-            explore(articlesTree, 20);
-            console.log(JSON.stringify(articlesTree));
-            var letterspanel = byId("letterspanel");
-            addRowOfLetters(letterspanel, allowedChars.split(''));
-            hideAllLetters();
-            refreshAllowedLetters();
-            fillCartArticles(listeCourses);
+            let cart = [];
+            let currentOpenCartId = -1;
+            // validateArticlesFormatAndBuildTree(callGetArticles());
+
+            function main(articles) {
+                articles = articles.sort();
+                // fillAllArticlesList(articles); je ne le fais pas car sinon j'ai des conflits dans les IDs de component
+                validateArticlesFormatAndBuildTree(articles);
+                explore(articlesTree, 20);
+                exploreForProposal(articlesTree, 40);
+                console.log(JSON.stringify(articlesTree));
+                var letterspanel = byId("letterspanel");
+                addRowOfLetters(letterspanel, allowedChars.split(''));
+                hideAllLetters();
+                refreshAllowedLetters();
+                fillCartArticles(cart); // TODO cest le carts ici par les articles autorisé...
+            }
+            function loadCart(id) {
+                callGetArticlesInCart(id, fillCartArticles);
+                currentOpenCartId = id;
+            }
+             callGetArticles(main);
+             callGetLatestCartId(loadCart);
         </script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>

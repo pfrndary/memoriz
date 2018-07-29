@@ -26,7 +26,28 @@ function waitAtLeastOneEvent() {
         }
     }, 20);
 }
-
+/*
+function waitAtLeastOneEvent() {
+    var event = null;
+    event = msgQueue.shift();
+    if (event) {
+        myTimer = null;
+        event();
+    } else {
+        while (!event) {
+            event = msgQueue.shift();
+            if (event) {
+                event();
+            }
+        }
+    }
+    while (event) {
+        event = msgQueue.shift();
+        if (event) {
+            event();
+        }
+    }
+}*/
 
 /*
 GENERATE HTML TAG
@@ -40,6 +61,7 @@ parentTag.appendChild(tagDiv);
 function htmlTag(tag, attr, innerHTML) {
     let element = document.createElement(tag);
     for (let k in attr) {
+        //log("key="+k+" ; value="+attr[k]);
         element.setAttribute(k, attr[k]);
     }
     if (innerHTML) {

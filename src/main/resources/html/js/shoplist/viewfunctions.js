@@ -1,6 +1,7 @@
 const LETTERS_NUMBER_PER_ROW = 5;
 const ARTICLES_CART_ID = "articlesCartId";
 const ARTICLES_LIST_ID = "articlesListId"; // proposition d'article
+const ALL_ARTICLES_LIST_ID = "allArticlesListId";
 
 function getLetterHtmlLink(letter) {
     let button = document.createElement('button');
@@ -21,6 +22,8 @@ function moveTo(letter) {
     hideAllLetters();
     if (relativePath[SOLUTION_FOUND]) {
       wordFound(relativePath[SOLUTION_FOUND]);
+    } else if (relativePath[PROPOSAL_KEY]) {
+        wordsFound(relativePath[PROPOSAL_KEY]);
     } else {
         refreshAllowedLetters();
     }
@@ -60,8 +63,23 @@ function getMaxNumberLetter(numRow) {
     refreshAllowedLetters();
 }
 
+function wordsFound(words) {
+    clearArticlesInModal();
+    fillPossibleArticles(words);
+    $('#exampleModal').modal();
+    relativePath = articlesTree;
+    refreshAllowedLetters();
+}
+
 function clearArticlesInModal() {
     let htmlElem = byId("articlesListId");
+    while (htmlElem.firstChild) {
+        htmlElem.removeChild(htmlElem.firstChild);
+    }
+}
+
+function clearArticlesInCartModal() {
+    let htmlElem = byId(ARTICLES_CART_ID);
     while (htmlElem.firstChild) {
         htmlElem.removeChild(htmlElem.firstChild);
     }
@@ -119,6 +137,9 @@ function fillPossibleArticles(articlesNames) {
         rowAnchor.innerHTML = articlesNames[i];
         htmlElem.appendChild(rowAnchor);
     }
+    if (articlesNames.length == 1) {
+        selectArticleInList("id"+articlesNames[0]);
+    }
 }
 
 let selectedItemId = null;
@@ -134,21 +155,23 @@ function selectArticleInList(id) {
 }
 
 const PREFIX_SPAN_ADDON = "spanAddon";
+const PREFIX_INPUT_QTY = "qty";
 function fillCartArticles(articlesJson) {
     let htmlElem = byId(ARTICLES_CART_ID);
+    log("fillCartArticles = " + JSON.stringify(articlesJson));
     for (let i = 0 ; i < articlesJson.length ; i++) {
         let a = articlesJson[i];
         let row = htmlTag("div", {class:"input-group mb-3"});
         let groupPrepend = htmlTag("div", {class:"input-group-prepend"});
         let labelLike = htmlTag("span", {class:"input-group-text", id:"spanAddon"+a.id}, a.name);
-        let inputQty = htmlTag("input", {id:a.id, value:a.qty, type:"number", readonly:""});
+        let inputQty = htmlTag("input", {id:PREFIX_INPUT_QTY+a.id, value:a.qty, type:"number", readonly:""});
         inputQty.setAttribute("class", "form-control");
         row.appendChild(groupPrepend);
         groupPrepend.appendChild(labelLike);
         groupPrepend.appendChild(inputQty);
-        groupPrepend.appendChild(htmlTag("button", { class:"btn btn-secondary", onclick:"decrById("+a.id+", 0)" }, "-"));
+        groupPrepend.appendChild(htmlTag("button", { class:"btn btn-secondary", onclick:"decrById('"+PREFIX_INPUT_QTY+a.id+"', 0)" }, "-"));
         groupPrepend.appendChild(htmlTag("button", { class:"btn btn-secondary disabled"}, "&nbsp;&nbsp;&nbsp;"));
-        groupPrepend.appendChild(htmlTag("button", { class:"btn btn-secondary", onclick:"incrById("+a.id+", 10)" }, "+"));
+        groupPrepend.appendChild(htmlTag("button", { class:"btn btn-secondary", onclick:"incrById('"+PREFIX_INPUT_QTY+a.id+"', 10)" }, "+"));
 
         htmlElem.appendChild(row);
     }
@@ -167,20 +190,21 @@ function spansByForId(parentElement) {
 
 function saveCart() {
     let htmlElem = byId(ARTICLES_CART_ID);
-    listeCourses = cartToJson(htmlElem);
-    callUpdateCart(listeCourses);
+    cart = cartToJson(htmlElem);
+    callUpdateCart(cart);
 }
 
 function cartToJson(element) {
-    let cart = [];
+    let cartConverted = [];
     let spans = spansByForId(element);
     let inputsQty = element.getElementsByTagName("input");
     for (let i = 0 ; i < inputsQty.length ; i++) {
-        let id = inputsQty[i].id;
+        let id = inputsQty[i].id.substring(PREFIX_INPUT_QTY.length, inputsQty[i].id.length);
+        log(spans + " " + id);
         let article = {id:id, name:spans[id], qty:parseInt(inputsQty[i].value)};
-        cart.push(article);
+        cartConverted.push(article);
     }
-    return cart;
+    return cartConverted;
 }
 
 function decrById(idElem, min) {
@@ -205,3 +229,12 @@ function incrById(idElem, max) {
     elem.value = ++value;
 }
 
+
+function fillAllArticlesList(articlesNames) {
+    let parentElement = byId(ALL_ARTICLES_LIST_ID);
+     for (let i = 0 ; i < articlesNames.length ; i++) {
+        let row = htmlTag("a", {id:"id"+ articlesNames[i], href:"#", class:"list-group-item list-group-item-action",
+            onclick:"selectArticleInList(this.id)"}, articlesNames[i]);
+        parentElement.appendChild(row);
+    }
+}
