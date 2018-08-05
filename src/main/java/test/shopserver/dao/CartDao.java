@@ -108,8 +108,17 @@ public class CartDao {
         }
     }
 
+    public boolean freezeCart(Connection conn, long id) throws SQLException {
+        final String sql = "UPDATE " + CartIdTable.TABLE_NAME + " SET " + CartIdTable.STATUS_COLUMN_NAME + " = 'c' WHERE " +
+                CartIdTable.ID_COLUMN_NAME+ " = ?;";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, id);
+            return ps.executeUpdate() > 0;
+        }
+    }
+
     public Long getLatestCarts(Connection conn) throws SQLException {
-        final String sql = "SELECT max(" + CartIdTable.ID_COLUMN_NAME + ") FROM " + CartIdTable.TABLE_NAME + " WHERE "+CartIdTable.STATUS_COLUMN_NAME + " = 'o';";
+        final String sql = "SELECT max(" + CartIdTable.ID_COLUMN_NAME + ") FROM " + CartIdTable.TABLE_NAME + " WHERE " + CartIdTable.STATUS_COLUMN_NAME + " = 'o';";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ResultSet resultSet = ps.executeQuery();
             if (resultSet.next()) {

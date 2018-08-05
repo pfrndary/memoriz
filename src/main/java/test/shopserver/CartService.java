@@ -42,6 +42,17 @@ public class CartService {
         }
     }
 
+    public long freezeCart(long idCart) throws SQLException {
+        try (Connection connection = getConnection()) {
+            final boolean frozen = cartDao.freezeCart(connection, idCart);
+            if (frozen) {
+                return cartDao.create(connection);
+            } else {
+                return -1;
+            }
+        }
+    }
+
     Map<String, Integer> getArticles(long idCart) throws SQLException {
         try (Connection connection = getConnection()) {
             return cartDao.getArticles(connection, idCart);

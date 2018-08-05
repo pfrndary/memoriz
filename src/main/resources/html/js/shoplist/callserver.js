@@ -76,3 +76,8 @@ function callGetArticles(initializer) {
           initializer(data);
     });
 }
+
+function sendListe() {
+    log('Sending liste de courses');
+    $.post('http://127.0.0.1:8080/api/carts/'+currentOpenCartId + '/send');
+}
