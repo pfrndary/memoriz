@@ -19,7 +19,7 @@ public class ShopVerticle extends AbstractVerticle {
 
     private CartService cartService;
 
-    public ShopVerticle() {
+    ShopVerticle() {
         cartService = new CartService();
         Prerequisite prerequisite
                 = new Prerequisite();
@@ -34,6 +34,7 @@ public class ShopVerticle extends AbstractVerticle {
         router.get("/api/articles").handler(this::getAllArticles);
         router.get("/api/carts").handler(this::getLatestCart);
         router.post("/api/carts").handler(this::createCart);
+        router.post("/api/carts/:id/send").handler(this::sendCart);
         router.get("/api/carts/:id").handler(this::getArticles);
         router.post("/api/carts/:id").handler(this::updateCart);
         router.post("/api/carts/:id/articles").handler(this::fillCart);
@@ -55,6 +56,11 @@ public class ShopVerticle extends AbstractVerticle {
                             }
                         }
                 );
+    }
+
+    private void sendCart(RoutingContext routingContext) {
+        final String id = routingContext.request().getParam("id");
+
     }
 
     private void getArticles(RoutingContext routingContext) {

@@ -13,19 +13,17 @@ public class CartService {
 
 
     private CartDao cartDao = new CartDao(CartTable.definition);
-    private Object latestCarts;
 
-    public CartService() {
+    CartService() {
     }
 
     public Long create() throws SQLException {
         try (Connection conn = getConnection()) {
             return cartDao.create(conn);
-        } finally {
         }
     }
 
-    public void addOrUpdateArticles(long idCart, Map<String, Integer> newValuesArticles) throws SQLException {
+    void addOrUpdateArticles(long idCart, Map<String, Integer> newValuesArticles) throws SQLException {
         try (Connection conn = getConnection()) {
             final Map<String, Integer> existingArticlesInCart = cartDao.getCartArticles(conn, idCart);
             final Map<String, Integer> newArticles = new HashMap<>();
@@ -35,21 +33,22 @@ public class CartService {
                 final Integer qty = existingArticlesInCart.get(entry.getKey());
                 if (qty == null) {
                     newArticles.put(entry.getKey(), entry.getValue());
-                } else if (!entry.equals(qty)) {
+                } else if (!entry.getValue().equals(qty)) {
                     articlesToUpdate.put(entry.getKey(), entry.getValue());
                 }
             }
             cartDao.update(conn, idCart, articlesToUpdate);
             cartDao.insert(conn, idCart, newArticles);
-        } finally {
         }
     }
 
-    public Map<String, Integer> getArticles(long idCart) throws SQLException {
-        return cartDao.getArticles(getConnection(), idCart);
+    Map<String, Integer> getArticles(long idCart) throws SQLException {
+        try (Connection connection = getConnection()) {
+            return cartDao.getArticles(connection, idCart);
+        }
     }
 
-    public Long getLatestCarts() throws SQLException {
+    Long getLatestCarts() throws SQLException {
         try (Connection conn = getConnection()) {
             return cartDao.getLatestCarts(conn);
         }

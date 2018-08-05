@@ -5,7 +5,7 @@
 function callAddCart(qty) {
     let article = byId(selectedItemId).innerHTML;
     let found = false;
-    for (let i = 0 ; i < cart.length() && !found ; i++) {
+    for (let i = 0 ; i < cart.length && !found ; i++) {
         if (cart[i].id == selectedItemId) {
             cart[i] += qty;
             found = true;
@@ -17,15 +17,13 @@ function callAddCart(qty) {
     }
     console.log('cmd '+article+' x '+qty);
     console.log(JSON.stringify(cart));
+    callUpdateCart(cart);
 }
 
 
 function callUpdateCart(data) {
-log('data to post : ' + JSON.stringify(data));
-$.post('http://127.0.0.1:8080/api/carts/'+currentOpenCartId, JSON.stringify(data));
-    /*let tmp = function() {
-        toto();
-    };*/
+    log('data to post : ' + JSON.stringify(data));
+    $.post('http://127.0.0.1:8080/api/carts/'+currentOpenCartId, JSON.stringify(data));
 }
 
 function doWithRetry(lamda, limitRetry) {
@@ -73,10 +71,6 @@ function callGetArticlesInCart(idCart, initializer) {
 
 
 function callGetArticles(initializer) {
-    /*$.get( "js/shoplist/tools.js", function( data ) {
-      alert(data );
-    });*/
-
     $.get( "http://127.0.0.1:8080/api/articles", function( data ) {
           log(data);
           initializer(data);
