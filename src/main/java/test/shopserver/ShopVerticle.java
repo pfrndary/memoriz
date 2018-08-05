@@ -83,8 +83,6 @@ public class ShopVerticle extends AbstractVerticle {
                 routingContext.response().setStatusCode(500).setStatusMessage(e.getMessage()).end();
             }
         });
-
-
     }
 
     private void getArticles(RoutingContext routingContext) {

@@ -4,47 +4,27 @@ import test.shopserver.tools.sql.Table;
 import test.shopserver.tools.sql.WhereBuilder;
 
 import java.sql.*;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CartDao {
 
     private Table cartDefinition;
-    private AtomicLong lastCartId = new AtomicLong();
-    private Map<String, Integer> cart = new ConcurrentHashMap<>();
-    private List<Map<String, Integer>> previousOrders = new ArrayList<>();
-    private Object latestCarts;
 
     public CartDao(Table cartDefinition) {
         this.cartDefinition = cartDefinition;
     }
 
-    public long create(Connection conn) {
-        previousOrders.add(cart);
-        try {
-            conn.prepareStatement("insert into cart_id (" + CartIdTable.STATUS_COLUMN_NAME + ") VALUES ('o');");// open
-        } catch (SQLException e) {
-            e.printStackTrace();
+    public long create(Connection conn) throws SQLException {
+        final String sql = "insert into cart_id (" + CartIdTable.STATUS_COLUMN_NAME + ") VALUES ('o');";
+        try (PreparedStatement preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            preparedStatement.executeUpdate();
+            ResultSet rs = preparedStatement.getGeneratedKeys();
+            rs.next();
+            return rs.getLong(1);
         }
-        cart = new ConcurrentHashMap<>();
-        return lastCartId.incrementAndGet();
     }
-
-    /*public void update(Connection conn, long id, Map<String, Integer> articles) throws SQLException {
-        Statement statement = conn.createStatement();
-        for (Map.Entry<String, Integer> entry : articles.entrySet()) {
-            cart.put(entry.getKey(), entry.getValue());
-            final Map<String, Object> insertionValues = new HashMap<>();
-            insertionValues.put(CartTable.ID_COLUMN_NAME, id);
-            insertionValues.put(CartTable.ARTICLE_COLUMN_NAME, entry.getKey());
-            insertionValues.put(CartTable.QTY_COLUMN_NAME, entry.getValue());
-            final String script = cartDefinition.getInsertScript(insertionValues);
-            statement.addBatch(script);
-        }
-        int[] ints = statement.executeBatch();
-        System.out.println(cart);
-    }*/
 
     public Map<String, Integer> getCartArticles(Connection conn, long idCart) throws SQLException {
         final Map<String, Integer> result = new HashMap<>();
@@ -66,7 +46,6 @@ public class CartDao {
     public void insert(Connection conn, long idCart, Map<String, Integer> newArticles) throws SQLException {
         final Statement statement = conn.createStatement();
         for (Map.Entry<String, Integer> entry : newArticles.entrySet()) {
-            cart.put(entry.getKey(), entry.getValue());
             final Map<String, Object> insertionValues = new HashMap<>();
             insertionValues.put(CartTable.ID_COLUMN_NAME, idCart);
             insertionValues.put(CartTable.ARTICLE_COLUMN_NAME, entry.getKey());
@@ -88,7 +67,6 @@ public class CartDao {
                 final boolean updated = ps.executeUpdate() > 0;
             }
         }
-        System.out.println(cart);
     }
 
     public Map<String, Integer> getArticles(Connection conn, long idCart) throws SQLException {
@@ -110,7 +88,7 @@ public class CartDao {
 
     public boolean freezeCart(Connection conn, long id) throws SQLException {
         final String sql = "UPDATE " + CartIdTable.TABLE_NAME + " SET " + CartIdTable.STATUS_COLUMN_NAME + " = 'c' WHERE " +
-                CartIdTable.ID_COLUMN_NAME+ " = ?;";
+                CartIdTable.ID_COLUMN_NAME + " = ?;";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, id);
             return ps.executeUpdate() > 0;

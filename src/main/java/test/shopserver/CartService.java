@@ -45,11 +45,11 @@ public class CartService {
     public long freezeCart(long idCart) throws SQLException {
         try (Connection connection = getConnection()) {
             final boolean frozen = cartDao.freezeCart(connection, idCart);
-            if (frozen) {
+            //if (frozen) {
                 return cartDao.create(connection);
-            } else {
+            /*} else {
                 return -1;
-            }
+            }*/
         }
     }
 
