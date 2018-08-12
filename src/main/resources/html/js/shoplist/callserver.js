@@ -1,4 +1,6 @@
-/*function callGetArticles() {
+/*
+http://127.0.0.1:8080
+function callGetArticles() {
     return mockDico;
 }*/
 
@@ -23,7 +25,7 @@ function callAddCart(qty) {
 
 function callUpdateCart(data) {
     log('data to post : ' + JSON.stringify(data));
-    $.post('http://127.0.0.1:8080/api/carts/'+currentOpenCartId, JSON.stringify(data));
+    $.post('/api/carts/'+currentOpenCartId, JSON.stringify(data));
 }
 
 function doWithRetry(lamda, limitRetry) {
@@ -51,14 +53,14 @@ function callRefreshArticles() {
 }
 
 function callGetLatestCartId(initializer) {
-    $.get( "http://127.0.0.1:8080/api/carts", function( data ) {
+    $.get( "/api/carts", function( data ) {
               log(data);
               initializer(data.id);
         });
 }
 
 function callGetArticlesInCart(idCart, initializer) {
-    $.get( "http://127.0.0.1:8080/api/carts/"+idCart, function( data ) {
+    $.get( "/api/carts/"+idCart, function( data ) {
           log(data);
           let articles = [];
           for (let articleName in data) {
@@ -71,7 +73,7 @@ function callGetArticlesInCart(idCart, initializer) {
 
 
 function callGetArticles(initializer) {
-    $.get( "http://127.0.0.1:8080/api/articles", function( data ) {
+    $.get( "/api/articles", function( data ) {
           log(data);
           initializer(data);
     });
@@ -79,5 +81,5 @@ function callGetArticles(initializer) {
 
 function sendListe() {
     log('Sending liste de courses');
-    $.post('http://127.0.0.1:8080/api/carts/'+currentOpenCartId + '/send');
+    $.post('/api/carts/'+currentOpenCartId + '/send');
 }
