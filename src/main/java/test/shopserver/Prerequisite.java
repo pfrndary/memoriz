@@ -26,12 +26,12 @@ class Prerequisite {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            System.exit(-1);
         }
     }
 
     private Connection getConnection() throws SQLException {
-        final JdbcConnectionPool cp = JdbcConnectionPool.
-                create("jdbc:h2:file:~/test", "sa", "sa");
+        final JdbcConnectionPool cp = JdbcConnectionPool.create("jdbc:h2:file:~/test", "sa", "sa");
         return cp.getConnection();
     }
 }
