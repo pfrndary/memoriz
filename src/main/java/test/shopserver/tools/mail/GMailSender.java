@@ -39,7 +39,7 @@ public final class GMailSender {
     private static final String TOKENS_DIRECTORY_PATH = "tokens";
 
     private static final List<String> SCOPES = Collections.singletonList(GmailScopes.GMAIL_COMPOSE);
-    private static final String CREDENTIALS_FILE_PATH = System.getenv("userprofile")+"/privatedev/credentials.json";
+    private static final String CREDENTIALS_FILE_PATH = System.getProperty("user.home")+"/privatedev/credentials.json";
 
     private final String mailFrom;
 
