@@ -79,6 +79,7 @@ public class ShopVerticle extends AbstractVerticle {
                 }
                 final String strCart = builder.toString();
                 gMailSender.send(Collections.singleton("pfremaux@gmail.com"), "Courses " + format.format(Calendar.getInstance().getTime()), strCart);
+                routingContext.response().setStatusCode(200).end();
             } catch (SQLException | MessagingException | IOException e) {
                 routingContext.response().setStatusCode(500).setStatusMessage(e.getMessage()).end();
             }

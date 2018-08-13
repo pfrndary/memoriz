@@ -71,7 +71,6 @@ function callGetArticlesInCart(idCart, initializer) {
     });
 }
 
-
 function callGetArticles(initializer) {
     $.get( "/api/articles", function( data ) {
           log(data);
@@ -81,5 +80,10 @@ function callGetArticles(initializer) {
 
 function sendListe() {
     log('Sending liste de courses');
-    $.post('/api/carts/'+currentOpenCartId + '/send');
+    $.post('/api/carts/'+currentOpenCartId + '/send', function (data) {
+        callGetLatestCartId(loadCart);
+        clearArticlesInCartModal();
+        clearArticlesInModal();
+        cart = [];
+    });
 }

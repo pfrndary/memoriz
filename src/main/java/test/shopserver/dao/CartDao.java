@@ -61,10 +61,10 @@ public class CartDao {
                 CartTable.ID_COLUMN_NAME + " = ? AND " + CartTable.ARTICLE_COLUMN_NAME + " = ?;";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             for (Map.Entry<String, Integer> entry : articles.entrySet()) {
-                ps.setLong(1, id);
-                ps.setInt(2, entry.getValue());
+                ps.setInt(1, entry.getValue());
+                ps.setLong(2, id);
                 ps.setString(3, entry.getKey());
-                final boolean updated = ps.executeUpdate() > 0;
+                ps.executeUpdate();
             }
         }
     }
