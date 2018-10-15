@@ -11,7 +11,10 @@ import io.vertx.ext.web.handler.StaticHandler;
 import test.shopserver.tools.mail.GMailSender;
 
 import javax.mail.MessagingException;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -19,15 +22,38 @@ import java.util.*;
 
 public class ShopVerticle extends AbstractVerticle {
 
+    private final String MAIL_CONFIG = "./src/main/resources/mail-config.properties";
+
     private CartService cartService;
     private GMailSender gMailSender;
+    private String senderEmail;
+    private Set<String> receiversEmail;
 
     ShopVerticle() {
         cartService = new CartService();
-        Prerequisite prerequisite
-                = new Prerequisite();
+        final Prerequisite prerequisite = new Prerequisite();
         prerequisite.execute();
-        gMailSender = new GMailSender("pfremaux.ca@gmail.com");
+
+        final Properties properties = new Properties();
+        final InputStream input;
+        try {
+            final File f = new File(MAIL_CONFIG);
+            System.out.println(f.getAbsolutePath());
+            input = new FileInputStream(MAIL_CONFIG);
+            properties.load(input);
+            senderEmail = properties.getProperty("sender");
+            receiversEmail = new HashSet<>();
+            int i = 1;
+            String value;
+            while ((value = properties.getProperty("receiver." + i)) != null) {
+                receiversEmail.add(value);
+                i++;
+            }
+            gMailSender = new GMailSender(senderEmail);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(-1);
+        }
     }
 
     @Override
@@ -35,14 +61,13 @@ public class ShopVerticle extends AbstractVerticle {
         super.start(startFuture);
         gMailSender.initialize();
         Router router = Router.router(vertx);
-        // router.route("/api/carts**").handler(BodyHandler.create());
         router.get("/api/articles").handler(this::getAllArticles);
         router.get("/api/carts").handler(this::getLatestCart);
         router.post("/api/carts").handler(this::createCart);
         router.post("/api/carts/:id/send").handler(this::sendCart);
         router.get("/api/carts/:id").handler(this::getArticles);
         router.post("/api/carts/:id").handler(this::updateCart);
-        router.post("/api/carts/:id/articles").handler(this::fillCart);
+        // router.post("/api/carts/:id/articles").handler(this::fillCart);
         router.route("/js/*").handler(StaticHandler.create("html/js"));
         router.route("/style/*").handler(StaticHandler.create("html/style"));
         router.route("/index").handler(StaticHandler.create("html/textassist.html"));
@@ -78,7 +103,7 @@ public class ShopVerticle extends AbstractVerticle {
                     builder.append("\n");
                 }
                 final String strCart = builder.toString();
-                gMailSender.send(Collections.singleton("pfremaux@gmail.com"), "Courses " + format.format(Calendar.getInstance().getTime()), strCart);
+                gMailSender.send(receiversEmail, "Courses " + format.format(Calendar.getInstance().getTime()), strCart);
                 routingContext.response().setStatusCode(200).end();
             } catch (SQLException | MessagingException | IOException e) {
                 routingContext.response().setStatusCode(500).setStatusMessage(e.getMessage()).end();
@@ -88,7 +113,6 @@ public class ShopVerticle extends AbstractVerticle {
 
     private void getArticles(RoutingContext routingContext) {
         final String id = routingContext.request().getParam("id");
-        // routingContext.request().handler((Buffer h) -> {
         try {
             final Map<String, Integer> articles = cartService.getArticles(Long.parseLong(id));
             routingContext.response()
@@ -97,11 +121,6 @@ public class ShopVerticle extends AbstractVerticle {
         } catch (SQLException e) {
             routingContext.response().setStatusCode(500).setStatusMessage(e.getMessage()).end();
         }
-        //});
-    }
-
-    private void fillCart(RoutingContext routingContext) {
-// TODO nettoyager si service non utilisé ?
     }
 
     private void updateCart(RoutingContext routingContext) {
@@ -120,10 +139,6 @@ public class ShopVerticle extends AbstractVerticle {
                 routingContext.response().setStatusCode(500).setStatusMessage(e.getMessage()).end();
             }
         });
-        //JsonObject bodyAsJson = routingContext.getBodyAsJson();
-        /*bodyAsJson.
-        Map<String, Integer> articles;*/
-        // TODO
     }
 
     private void createCart(RoutingContext routingContext) {

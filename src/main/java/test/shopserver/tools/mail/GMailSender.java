@@ -34,12 +34,12 @@ import java.util.List;
 import java.util.Properties;
 
 public final class GMailSender {
-    private static final String APPLICATION_NAME = "Gmail API Java Quickstart";
+    private static final String APPLICATION_NAME = "Gmail API Java";
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     private static final String TOKENS_DIRECTORY_PATH = "tokens";
 
     private static final List<String> SCOPES = Collections.singletonList(GmailScopes.GMAIL_COMPOSE);
-    private static final String CREDENTIALS_FILE_PATH = System.getProperty("user.home")+"/privatedev/credentials.json";
+    private static final String CREDENTIALS_FILE_PATH = System.getProperty("user.home") + "/privatedev/credentials.json";
 
     private final String mailFrom;
 
@@ -52,9 +52,13 @@ public final class GMailSender {
 
     public void initialize() throws GeneralSecurityException, IOException {
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-        service = new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
-                .setApplicationName(APPLICATION_NAME)
-                .build();
+        try {
+            service = new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+                    .setApplicationName(APPLICATION_NAME)
+                    .build();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void send(Collection<String> tos, String subject, String bodyText) throws MessagingException, IOException {
@@ -74,9 +78,7 @@ public final class GMailSender {
      * @throws IOException If the credentials.json file cannot be found.
      */
     private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException {
-        // Load client secrets.
         File f = new File(CREDENTIALS_FILE_PATH);
-        System.out.println(f.getAbsolutePath() + f.exists());
 
         InputStream in = new FileInputStream(f);
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
@@ -88,12 +90,6 @@ public final class GMailSender {
                 .setAccessType("offline")
                 .build();
         return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
-    }
-
-    public static void main(String... args) throws IOException, GeneralSecurityException, MessagingException {
-        GMailSender gMailSender = new GMailSender("pfremaux.ca@gmail.com");
-        gMailSender.initialize();
-        gMailSender.send(Collections.singleton("pfremaux@gmail.com"), "s", "b");
     }
 
     private static MimeMessage createEmailWithAttachment(String to, String from, String subject, String bodyText, File file)
